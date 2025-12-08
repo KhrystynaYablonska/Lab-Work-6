@@ -1,0 +1,6 @@
+2025-12-05 11:57:04,756 - FileLogger - INFO - 'config.xml' - Метод read_file виконано.
+2025-12-05 11:57:04,756 - FileLogger - INFO - 'config.xml' - Метод read_file виконано.
+2025-12-05 11:57:04,756 - FileLogger - INFO - 'config.xml' - Метод write_file виконано.
+2025-12-05 11:57:04,756 - FileLogger - INFO - 'config.xml' - Метод append_to_file виконано.
+2025-12-05 11:57:04,756 - FileLogger - INFO - 'config.xml' - Метод read_file виконано.
+2025-12-05 11:57:04,756 - FileLogger - ERROR - ПОМИЛКА: 'bad.txt' - Метод read_file викликав FileCorruptedError: Проблема з файлом 'bad.txt'. Оригінальна помилка: Некоректний XML: syntax error: line 1, column 0
