@@ -8,14 +8,14 @@ if os.path.exists('file.operations.txt'):
 
 class FileHandlerException(Exception):
     """
-    виняток для всіх помилок обробника файлів
+    exception for all file handler errors
     """
     pass
 
 
 class FileNotFound(FileHandlerException):
     """
-    виняток при відкритті файла, якого не існує
+    exception when opening a file that does not exist
     """
 
     def __init__(self, path):
@@ -24,15 +24,14 @@ class FileNotFound(FileHandlerException):
 
 class FileCorruptedError(FileHandlerException):
     """
-    виняток при пошкодженні файлу
+    file corruption exception
     """
+
+    LOG_FILE = 'file.operations.txt'
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
     def __init__(self, path, original_error):
         super().__init__(f"Проблема з файлом '{path}'. Оригінальна помилка: {original_error}")
-
-
-LOG_FILE = 'file.operations.txt'
-LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
 
 def setup_logger(mode):
