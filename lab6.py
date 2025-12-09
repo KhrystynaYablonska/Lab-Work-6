@@ -49,10 +49,7 @@ def setup_logger(mode):
 
     if mode == 'console':
         handler = logging.StreamHandler()
-    elif mode == 'file':
-        handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
-    else:
-        raise ValueError("Недійсний режим логування. Використайте 'console' або 'file'")
+    handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
 
     formatter = logging.Formatter(LOG_FORMAT)
     handler.setFormatter(formatter)
@@ -165,7 +162,6 @@ try:
     with open('bad.txt', 'w', encoding='utf-8') as f:
         f.write(bad_content)
 
-    print("\n--- ПОЧАТОК ТЕСТУВАННЯ XMLHandler ---")
 
     try:
         print("\n[ТЕСТ 1]: Спроба відкрити неіснуючий файл...")
