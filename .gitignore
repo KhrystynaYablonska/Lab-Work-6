@@ -1,4 +1,7 @@
 file.operations.txt
 .DS_Store
+.idea/
 bad.txt
 config.xml
+__pycache__/
+*.pyc
