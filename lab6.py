@@ -3,33 +3,17 @@ from functools import wraps
 import os
 import xml.etree.ElementTree as ET
 
-LOG_FILE = 'file.operations.txt'
-LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-
-if os.path.exists('file.operations.txt'):
-    os.remove('file.operations.txt')
 
 class FileHandlerException(Exception):
-    """
-    exception for all file handler errors
-    """
     pass
 
 
 class FileNotFound(FileHandlerException):
-    """
-    exception when opening a file that does not exist
-    """
-
     def __init__(self, path):
         super().__init__(f"File not found at path: {path}")
 
 
 class FileCorruptedError(FileHandlerException):
-    """
-    file corruption exception
-    """
-
     def __init__(self, path, original_error):
         super().__init__(f"Problem with file '{path}'. Original error: {original_error}")
 
@@ -38,6 +22,8 @@ def setup_logger():
     """
     :return: logger object, ready to use
     """
+    LOG_FILE = 'file.operations.txt'
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
     logger = logging.getLogger('FileLogger')
     logger.setLevel(logging.INFO)
@@ -46,13 +32,13 @@ def setup_logger():
         logger.handlers.clear()
 
     handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
-
     formatter = logging.Formatter(LOG_FORMAT)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
     return logger
 
+logger = setup_logger()
 
 def logged(exception_class):
     """
@@ -60,8 +46,6 @@ def logged(exception_class):
     :param exception_class: exception class for logging
     :return: decorator function
     """
-
-    logger = setup_logger()
 
     def decorator(func):
         @wraps(func)
@@ -77,9 +61,7 @@ def logged(exception_class):
                 )
                 logger.error(error_message)
                 raise
-
         return wrapper
-
     return decorator
 
 
@@ -128,9 +110,7 @@ class XMLHandler:
 
     @logged(FileHandlerException)
     def append_to_file(self, new_element_tag, attributes=None, text_content=None):
-        """
-        Add a new element to the root of the current XML document.
-        """
+
         attributes = attributes if attributes is not None else {}
         root = self.read_file()
 
@@ -150,44 +130,44 @@ xml_content = """<?xml version="1.0" encoding="utf-8"?>
 
 bad_content = "This is not valid XML data <tag_without_closing_tag"
 
-try:
-    with open('config.xml', 'w', encoding='utf-8') as f:
-        f.write(xml_content)
-
-    with open('bad.txt', 'w', encoding='utf-8') as f:
-        f.write(bad_content)
-
+def main():
+    log_file_path = 'file.operations.txt'
+    if os.path.exists(log_file_path):
+        os.remove(log_file_path)
 
     try:
-        print("\n[TEST 1]: Attempting to open a non-existent file...")
-        handler = XMLHandler("non_existent_file.xml")
-    except FileHandlerException as e:
-        print(f"Success: Exception caught {e.__class__.__name__}: {e}")
+        with open('config.xml', 'w', encoding='utf-8') as f:
+            f.write(xml_content)
 
-    print("\n[TEST 2]: Successfully reading and appending an element...")
-    xml_handler = XMLHandler('config.xml')
+        with open('bad.txt', 'w', encoding='utf-8') as f:
+            f.write(bad_content)
 
-    print(">> Call read_file (Logged to file)")
-    xml_handler.read_file()
 
-    print(">> Call append_to_file (Logged to file)")
-    xml_handler.append_to_file("data_item", attributes={"id": "1"}, text_content="New Value")
+        print("[TEST 1]: Successfully reading and appending an element...")
+        xml_handler = XMLHandler('config.xml')
 
-    new_root = xml_handler.read_file()
-    print(f"Number of elements after adding: {len(new_root)}")
+        print(">> Call read_file (Logged to file)")
+        xml_handler.read_file()
 
-    try:
-        print("\n[TEST 3]: Attempting to read malformed XML...")
-        bad_handler = XMLHandler('bad.txt')
-        bad_handler.read_file()
+        print(">> Call append_to_file (Logged to file)")
+        xml_handler.append_to_file("data_item", attributes={"id": "1"}, text_content="New Value")
 
-    except FileCorruptedError as e:
-        print(f"Success: Caught {e.__class__.__name__}: {e}")
-    except FileNotFound:
-        pass
+        new_root = xml_handler.read_file()
+        print(f"Number of elements after adding: {len(new_root)}")
 
-    for handler in logging.getLogger('FileLogger').handlers:
-        handler.flush()
+        try:
+            print("[TEST 2]: Attempting to read malformed XML...")
+            bad_handler = XMLHandler('bad.txt')
+            bad_handler.read_file()
 
-except Exception as e:
-    print(f"Critical error in test block execution: {e}")
+        except FileCorruptedError as e:
+            print(f"Success: Caught {e.__class__.__name__}: {e}")
+
+        for handler in logging.getLogger('FileLogger').handlers:
+            handler.flush()
+
+    except Exception as e:
+        print(f"Critical error in test block execution: {e}")
+
+if __name__ == "__main__":
+    main()
