@@ -3,42 +3,22 @@ from functools import wraps
 import os
 import xml.etree.ElementTree as ET
 
-
 class FileHandlerException(Exception):
+    """exception for all file handler errors"""
     pass
 
 
 class FileNotFound(FileHandlerException):
+    """exception when opening a file that does not exist"""
     def __init__(self, path):
         super().__init__(f"File not found at path: {path}")
 
 
 class FileCorruptedError(FileHandlerException):
+    """file corruption exception"""
     def __init__(self, path, original_error):
         super().__init__(f"Problem with file '{path}'. Original error: {original_error}")
 
-
-def setup_logger():
-    """
-    :return: logger object, ready to use
-    """
-    LOG_FILE = 'file.operations.txt'
-    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-
-    logger = logging.getLogger('FileLogger')
-    logger.setLevel(logging.INFO)
-
-    if logger.hasHandlers():
-        logger.handlers.clear()
-
-    handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
-    formatter = logging.Formatter(LOG_FORMAT)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    return logger
-
-logger = setup_logger()
 
 def logged(exception_class):
     """
@@ -46,6 +26,17 @@ def logged(exception_class):
     :param exception_class: exception class for logging
     :return: decorator function
     """
+    LOG_FILE = 'file.operations.txt'
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+    logger = logging.getLogger('FileLogger')
+    logger.setLevel(logging.INFO)
+
+    if not logger.hasHandlers():
+        handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
+        formatter = logging.Formatter(LOG_FORMAT)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
     def decorator(func):
         @wraps(func)
@@ -63,7 +54,6 @@ def logged(exception_class):
                 raise
         return wrapper
     return decorator
-
 
 class XMLHandler:
     def __init__(self, file_path):
@@ -129,6 +119,7 @@ xml_content = """<?xml version="1.0" encoding="utf-8"?>
 </settings>"""
 
 bad_content = "This is not valid XML data <tag_without_closing_tag"
+
 
 def main():
     log_file_path = 'file.operations.txt'
