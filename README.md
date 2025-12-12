@@ -1,2 +1,2 @@
 # Lab-Work-6
-Обробник XML-файлів на Python. Демонструє власні винятки та параметризований декоратор для логування операцій у файл/консоль.
+Python XML file handler. Demonstrates custom exceptions and a parameterized decorator for logging operations to a file
